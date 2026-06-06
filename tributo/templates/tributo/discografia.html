@@ -1,0 +1,59 @@
+{% extends 'tributo/base.html' %}
+
+{% block title %}Discografia - Massimo Ranieri Tribute{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center display-4 fw-bold mb-5" style="color: #4a1525;">I Grandi Successi</h1>
+
+    <!-- Apertura della griglia simmetrica: max 3 colonne su schermi desktop -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        
+        {% for canzone in canzoni %}
+            <div class="col">
+                <!-- La classe h-100 garantisce che tutte le card abbiano la stessa altezza nella riga -->
+                <div class="card h-100 shadow-sm border-0 border-top border-danger border-3">
+                    
+                    <!-- Sezione Copertina Album -->
+                    {% if canzone.copertina %}
+                        <img src="{{ canzone.copertina.url }}" class="card-img-top" alt="{{ canzone.titolo }}" style="height: 250px; object-fit: cover;">
+                    {% else %}
+                        <!-- Custodia vinile finta se manca la copertina reale -->
+                        <div class="bg-dark text-center text-light d-flex flex-column align-items-center justify-content-center" style="height: 250px;">
+                            <div class="fs-1">🎵</div>
+                            <span class="small text-uppercase text-muted mt-2">Nessuna Copertina</span>
+                        </div>
+                    {% endif %}
+
+                    <!-- Corpo della Card con Flexbox verticale -->
+                                        <!-- Corpo della Card -->
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-secondary align-self-start mb-2">Anno {{ canzone.anno_uscita }}</span>
+                        <h5 class="card-title fw-bold text-dark mb-3">{{ canzone.titolo }}</h5>
+                        
+                        <div class="card-text text-secondary small flex-grow-1 mb-3">
+                            {{ canzone.testo|linebreaks|truncatewords:20 }}
+                        </div>
+
+                        <!-- NUOVA SEZIONE: Prezzo e Bottone -->
+                        <div class="mt-auto border-top pt-3 d-flex justify-content-between align-items-center">
+                            <span class="fs-4 fw-bold text-dark">€ {{ canzone.prezzo }}</span>
+                            <a href="{% url 'ordine_riepilogo' canzone.id %}" class="btn btn-teatro btn-sm">Acquista Ora</a>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        {% empty %}
+            <!-- Messaggio visualizzato se la tabella delle canzoni è vuota -->
+            <div class="col-12 w-100">
+                <div class="alert alert-warning text-center" role="alert">
+                    Nessun brano inserito nella discografia. Accedi all'amministrazione per aggiungere musica!
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'tributo/base.html' %}
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-7 mx-auto">
+            <div class="card shadow p-4 border-0">
+                <h2 class="fw-bold mb-4" style="color: #4a1525;">Prenotazione Spettacolo Teatrale</h2>
+                
+                <div class="bg-light p-3 rounded mb-4">
+                    <h5 class="fw-bold mb-1">{{ concerto.luogo }}</h5>
+                    <p class="text-muted mb-0">{{ concerto.citta }} — {{ concerto.data }}</p>
+                    <div class="fw-bold mt-2 text-danger">Prezzo unitario: € {{ concerto.prezzo }}</div>
+                </div>
+
+<!-- Cerca questa riga: -->
+                                        <!-- E SOSTITUISCILA ESATTAMENTE CON QUESTA: -->
+                    <form action="{% url 'concerto_riepilogo' concerto.id %}" method="POST">
+                        {% csrf_token %} <!-- Richiesto per la sicurezza dei form POST -->
+
+                    <!-- Sezione Quantità -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Numero di Biglietti</label>
+                        <input type="number" id="id_quantita" name="quantita" class="form-control form-control-lg" value="1" min="1" max="5" required>
+                    </div>
+
+                    <!-- Contenitore Campi Biglietti Dinamici -->
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">Intestatari dei Biglietti</h5>
+                    <div id="contenitore-biglietti">
+                        <!-- Il primo biglietto è pre-caricato -->
+                        <div class="bg-light p-3 rounded mb-3 border">
+                            <h6 class="fw-bold text-secondary">Biglietto #1 (Acquirente)</h6>
+                            <div class="mb-2">
+                                <input type="text" name="nomi_biglietti" class="form-control form-control-sm" placeholder="Nome e Cognome" required>
+                            </div>
+                            <div>
+                                <input type="email" name="email_biglietti" class="form-control form-control-sm" placeholder="Email" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 btn-lg mt-3">Procedi all'Emissione</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script per moltiplicare i moduli dei nominativi -->
+<script>
+    const inputQuantita = document.getElementById('id_quantita');
+    const contenitore = document.getElementById('contenitore-biglietti');
+
+    inputQuantita.addEventListener('input', function() {
+        const qta = parseInt(this.value) || 1;
+        contenitore.innerHTML = ''; // Svuota e rigenera
+        
+        for (let i = 1; i <= qta; i++) {
+            const div = document.createElement('div');
+            div.className = 'bg-light p-3 rounded mb-3 border';
+            div.innerHTML = `
+                <h6 class="fw-bold text-secondary">Biglietto #${i}</h6>
+                <div class="mb-2">
+                    <input type="text" name="nomi_biglietti" class="form-control form-control-sm" placeholder="Nome e Cognome" required>
+                </div>
+                <div>
+                    <input type="email" name="email_biglietti" class="form-control form-control-sm" placeholder="Email" required>
+                </div>
+            `;
+            contenitore.appendChild(div);
+        }
+    });
+</script>
+{% endblock %}

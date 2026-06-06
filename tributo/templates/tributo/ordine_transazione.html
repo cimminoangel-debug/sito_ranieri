@@ -1,0 +1,26 @@
+{% extends 'tributo/base.html' %}
+{% block content %}
+<div class="container my-5 text-center">
+    <div class="row py-5">
+        <div class="col-md-6 mx-auto">
+            <div class="card shadow p-5 border-0 border-top border-success border-4">
+                <div class="display-1 text-success mb-3">✓</div>
+                <h2 class="fw-bold text-dark mb-2">Transazione Completata!</h2>
+                <p class="text-muted mb-4">Grazie per il tuo acquisto. Il pagamento per <strong>{{ canzone.titolo }}</strong> è andato a buon fine.</p>
+                
+                <!-- Box Riepilogo Aggiornato -->
+                <div class="alert alert-secondary text-start mb-4">
+                    <small class="d-block mb-1"><strong>ID Transazione:</strong> #TRS-{{ transazione_id }}</small>
+                    <small class="d-block mb-1"><strong>Prodotto:</strong> {{ canzone.titolo }} (x{{ quantita }})</small>
+                    <small class="d-block mb-1"><strong>Inviato a:</strong> {{ email }}</small>
+                    <small class="d-block"><strong>Importo Totale Prelevato:</strong> € {{ totale }}</small>
+                </div>
+                
+                <p class="text-secondary small mb-4">Il link per scaricare il brano in alta definizione è stato inviato alla tua email.</p>
+                
+                <a href="{% url 'discografia' %}" class="btn btn-teatro">Torna alla Discografia</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

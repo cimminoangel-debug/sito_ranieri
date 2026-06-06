@@ -1,0 +1,48 @@
+{% extends 'tributo/base.html' %}
+
+{% block content %}
+<div class="container my-5 text-center">
+    <div class="row px-2">
+        <div class="col-md-6 mx-auto">
+            
+            {% if errore_duplicato %}
+                <!-- SCHERMATA ROSSA: BIGLIETTO GIÀ USATO -->
+                <div class="card shadow-lg border-0 bg-danger text-white p-5 rounded-3">
+                    <div class="display-1 mb-3">⚠️</div>
+                    <h1 class="fw-bold mb-2">ACCESSO NEGATO</h1>
+                    <h3 class="bg-white text-danger d-inline-block px-3 py-1 rounded font-monospace fw-bold mb-4">
+                        {{ p.codice_biglietto }}
+                    </h3>
+                    <div class="alert alert-light text-start border-0 text-dark">
+                        <p class="mb-1"><strong>ATTENZIONE:</strong> Questo biglietto è già stato utilizzato per l'ingresso!</p>
+                        <p class="mb-0 small text-muted">Tentativo di accesso multiplo non autorizzato.</p>
+                    </div>
+                </div>
+            {% else %}
+                <!-- SCHERMATA VERDE: INGRESSO VALIDO -->
+                <div class="card shadow-lg border-0 bg-success text-white p-5 rounded-3">
+                    <div class="display-1 mb-3">✓</div>
+                    <h1 class="fw-bold mb-2">INGRESSO VALIDO</h1>
+                    <h3 class="bg-white text-success d-inline-block px-3 py-1 rounded font-monospace fw-bold mb-4">
+                        {{ p.codice_biglietto }}
+                    </h3>
+                    
+                    <div class="text-start bg-white text-dark p-4 rounded shadow-sm">
+                        <h5 class="fw-bold border-bottom pb-2 mb-3" style="color: #4a1525;">Dati Spettatore</h5>
+                        <p class="mb-2"><strong>Nominativo:</strong> {{ p.nome_completo }}</p>
+                        <p class="mb-2"><strong>Email:</strong> {{ p.email }}</p>
+                        <p class="mb-0"><strong>Evento:</strong> {{ p.concerto.luogo }} ({{ p.concerto.citta }})</p>
+                    </div>
+                    
+                    <p class="mt-4 mb-0 text-white-50 small">Smarcatura avvenuta con successo nel database.</p>
+                </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{% url 'lista_partecipanti' %}" class="btn btn-outline-dark">Torna al Registro Totale</a>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

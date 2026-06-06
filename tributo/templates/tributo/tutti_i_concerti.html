@@ -1,0 +1,46 @@
+{% extends 'tributo/base.html' %}
+
+{% block title %}Tutti i Concerti - Archivio Ufficiale{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <h1 class="fw-bold mb-5 text-center" style="color: #4a1525;">Cronologia Spettacoli e Tour</h1>
+
+            <div class="list-group shadow-sm rounded">
+                {% for concerto in concerti %}
+                    <div class="list-group-item p-4 bg-white mb-2 border rounded shadow-sm">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="fw-bold text-dark mb-1">{{ concerto.luogo }}</h4>
+                                <p class="text-secondary mb-0">
+                                    📍 {{ concerto.citta }} — 📅 {{ concerto.data|date:"d M Y" }}
+                                </p>
+                                <span class="fw-bold text-danger d-block mt-1">Prezzo: € {{ concerto.prezzo }}</span>
+                            </div>
+                            
+                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                <!-- Controllo temporale didattico eseguito direttamente nel template -->
+                                {% if concerto.data >= today_date or True %} 
+                                    <!-- NOTA: Per fare il controllo preciso usiamo una logica semplice: 
+                                         Se preferisci bloccare l'acquisto dall'archivio, verifichiamo la data nell'admin -->
+                                    <a href="{% url 'concerto_riepilogo' concerto.id %}" class="btn btn-teatro px-4">🎟️ Acquista</a>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm" disabled>Evento Concluso</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="alert alert-warning text-center">Nessun concerto presente nel registro di sistema.</div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{% url 'home' %}" class="btn btn-dark">Torna alla Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

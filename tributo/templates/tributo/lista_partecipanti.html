@@ -1,0 +1,162 @@
+{% extends 'tributo/base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="fw-bold mb-4 text-dark">Registro Biglietti Emessi</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success shadow-sm" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <!-- NUOVA SEZIONE: CONTATORI VISIVI IN TEMPO REALE -->
+    <div class="row g-3 mb-4">
+        <!-- Card Biglietti Venduti -->
+        <div class="col-6 col-md-3">
+            <div class="card border-0 bg-dark text-white p-3 shadow-sm text-center">
+                <small class="text-uppercase tracking-wider text-muted font-monospace" style="font-size: 0.75rem;">Biglietti Venduti</small>
+                <div class="display-5 fw-bold my-1">{{ totale_venduti }}</div>
+            </div>
+        </div>
+        
+        <!-- Card Ingressi Effettuati -->
+        <div class="col-6 col-md-3">
+            <div class="card border-0 bg-success text-white p-3 shadow-sm text-center">
+                <small class="text-uppercase tracking-wider text-white-50 font-monospace" style="font-size: 0.75rem;">Spettatori Entrati</small>
+                <div class="display-5 fw-bold my-1">{{ totale_ingressi }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEZIONE FILTRO: Combolist eventi (Lascia invariato il codice sotto) -->
+    <div class="card p-3 mb-4 bg-light border-0 shadow-sm">
+        <!-- SEZIONE FILTRI AGGIORNATA: Combolist + Ricerca Testuale -->
+    <div class="card p-3 mb-4 bg-light border-0 shadow-sm">
+        <form method="GET" action="{% url 'lista_partecipanti' %}" class="row g-3 align-items-end">
+            
+            <!-- Campo 1: Combolist Eventi -->
+            <div class="col-md-5 col-lg-4">
+                <label for="id_concerto" class="form-label small fw-bold text-secondary">Filtra per Spettacolo Teatrale</label>
+                <select name="concerto_id" id="id_concerto" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Mostra tutti gli eventi --</option>
+                    {% for c in concerti %}
+                        <option value="{{ c.id }}" {% if concerto_selezionato_id == c.id|slugify %}selected{% endif %}>
+                            {{ c.luogo }} ({{ c.citta }}) — {{ c.data }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Campo 2: Input di Ricerca Nome/Cognome -->
+            <div class="col-md-5 col-lg-4">
+                <label for="id_ricerca" class="form-label small fw-bold text-secondary">Cerca Spettatore (Nome o Cognome)</label>
+                <div class="input-group">
+                    <input type="text" name="q" id="id_ricerca" class="form-control" placeholder="Es. Rossi..." value="{{ testo_ricerca }}">
+                    <button class="btn btn-dark" type="submit">🔍 Cerca</button>
+                </div>
+            </div>
+
+            <!-- NUOVI PULSANTI DI AZIONE: RESET ED ESPORTAZIONE EXCEL -->
+            <div class="col-md-2 d-flex gap-2">
+                <!-- Pulsante Excel (Sempre visibile, passa i filtri tramite uno script rapido) -->
+                <button type="button" onclick="scaricaExcel()" class="btn btn-success w-100" title="Esporta in Excel">
+                    📊 Excel
+                </button>
+
+                {% if concerto_selezionato_id or testo_ricerca %}
+                    <a href="{% url 'lista_partecipanti' %}" class="btn btn-outline-secondary w-100">Resetta</a>
+                {% endif %}
+            </div>
+
+        <!-- TABELLA REGISTRO PARTECIPANTI (OTTIMIZZATA PER MOBILE) -->
+    <div class="card shadow border-0">
+        <!-- La classe table-responsive dice a Bootstrap di attivare lo swipe laterale SOLO su smartphone -->
+        <div class="table-responsive">
+            <!-- La classe table-sm riduce lo spazio interno (padding) per far entrare più dati su mobile -->
+            <table class="table table-sm table-hover align-middle mb-0" style="min-width: 800px;">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="py-3 px-2">Codice</th>
+                        <th class="py-3">Partecipante</th>
+                        <th class="py-3">Email</th>
+                        <th class="py-3">Spettacolo / Luogo</th>
+                        <th class="py-3">Data Acquisto</th>
+                        <th class="py-3">Stato</th>
+                        <th class="py-3 text-end px-3">Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in partecipanti %}
+                        <tr>
+                            <!-- Codice Biglietto evidenziato e compatto -->
+                            <td class="font-monospace fw-bold text-danger px-2" style="font-size: 0.85rem;">
+                                {{ p.codice_biglietto }}
+                            </td>
+                            
+                            <!-- Nome del partecipante -->
+                            <td class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                {{ p.nome_completo }}
+                            </td>
+                            
+                            <!-- Email -->
+                            <td class="text-secondary" style="font-size: 0.85rem;">
+                                {{ p.email }}
+                            </td>
+                            
+                            <!-- Spettacolo -->
+                            <td class="text-truncate" style="max-width: 180px; font-size: 0.85rem;" title="{{ p.concerto.luogo }}">
+                                {{ p.concerto.luogo }} <span class="text-muted">({{ p.concerto.citta }})</span>
+                            </td>
+                            
+                            <!-- Data italiana corta -->
+                            <td class="text-muted" style="font-size: 0.8rem;">
+                                {{ p.data_acquisto|date:"d/m/Y H:i" }}
+                            </td>
+                            
+                            <!-- Stato d'ingresso con Badge compatto -->
+                            <td>
+                                {% if p.utilizzato %}
+                                    <span class="badge bg-danger text-uppercase" style="font-size: 0.7rem; padding: 5px 8px;">🚫 Usato</span>
+                                {% else %}
+                                    <span class="badge bg-success text-uppercase" style="font-size: 0.7rem; padding: 5px 8px;">🎟️ Libero</span>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Colonna Azioni con Pulsanti compatti e distanziati -->
+                            <td class="text-end px-3">
+                                <div class="d-inline-flex gap-1">
+                                    <a href="{% url 'vedi_pdf_biglietto' p.id %}" target="_blank" class="btn btn-outline-danger btn-sm" style="font-size: 0.75rem; padding: 2px 6px;" title="Vedi PDF">
+                                        👁️ <span class="d-none d-lg-inline">Vedi</span>
+                                    </a>
+                                    <a href="{% url 'reinvia_biglietto' p.id %}" class="btn btn-outline-dark btn-sm" style="font-size: 0.75rem; padding: 2px 6px;" title="Reinvia Email">
+                                        🖨️ <span class="d-none d-lg-inline">Reinvia</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center p-4 text-muted">Nessun biglietto emesso per i criteri di ricerca selezionati.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<script>
+    function scaricaExcel() {
+        // Prende i valori attuali dei campi di filtro
+        const concertoId = document.getElementById('id_concerto').value;
+        const ricercaQ = document.getElementById('id_ricerca').value;
+        
+        //Costruisce l'indirizzo di download unendo i parametri attivi-->
+        let url = "{% url 'esporta_excel_partecipanti' %}?concerto_id=" + concertoId + "&q=" + encodeURIComponent(ricercaQ);
+        
+        // Avvia il download del file
+        window.location.href = url;
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'tributo/base.html' %}
+
+{% block title %}Scanner Controllo Varchi{% endblock %}
+
+{% block content %}
+<div class="container my-4 text-center">
+    <div class="row px-2">
+        <div class="col-md-6 mx-auto">
+            <div class="card shadow p-4 border-0 bg-white">
+                <h3 class="fw-bold mb-3" style="color: #4a1525;">Controllo Varchi attivo</h3>
+                <p class="text-muted small">Inquadra il QR Code sul biglietto del fan (cartaceo o da smartphone) per effettuarne la smarcatura.</p>
+                
+                <!-- Finestra video in cui comparirà la fotocamera -->
+                <div id="reader" class="rounded shadow-sm overflow-hidden border mb-4" style="width: 100%; background: #000;"></div>
+                
+                <!-- Box per mostrare lo stato del caricamento o errori -->
+                <div id="scanner-status" class="alert alert-secondary small py-2 d-none"></div>
+
+                <a href="{% url 'lista_partecipanti' %}" class="btn btn-outline-dark w-100">Torna al Registro</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Carica la libreria di scansione ufficiale HTML5 direttamente via CDN -->
+<script src="https://unpkg.com" type="text/javascript"></script>
+
+<script>
+    function onScanSuccess(decodedText, decodedResult) {
+        // Questa funzione si attiva non appena la fotocamera legge un QR Code
+        const statusBox = document.getElementById('scanner-status');
+        statusBox.classList.remove('d-none');
+        statusBox.className = "alert alert-info small py-2";
+        statusBox.innerText = "QR Code rilevato! Elaborazione in corso...";
+
+        // Controlliamo che il testo letto sia effettivamente un link del nostro portale
+        if (decodedText.includes('/gestione/valida/')) {
+            // Interrompe temporaneamente la fotocamera per evitare letture doppie
+            html5QrcodeScanner.clear();
+            // Reindirizza istantaneamente il browser del controllore alla pagina di validazione
+            window.location.href = decodedText;
+        } else {
+            statusBox.className = "alert alert-danger small py-2";
+            statusBox.innerText = "Errore: Questo non è un biglietto valido per lo spettacolo.";
+        }
+    }
+
+    function onScanFailure(error) {
+        // Ignoriamo i fallimenti continui di scansione fotogramma per fotogramma (normale amministrazione)
+    }
+
+    // Configurazione dello scanner: 25 fotogrammi al secondo, box di puntamento quadrato
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", 
+        { fps: 25, qrbox: {width: 250, height: 250} }, 
+        /* verbose= */ false
+    );
+    
+    // Avvia la fotocamera all'apertura della pagina
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+</script>
+{% endblock %}

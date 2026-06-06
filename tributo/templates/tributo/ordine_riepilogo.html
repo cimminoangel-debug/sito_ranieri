@@ -1,0 +1,42 @@
+{% extends 'tributo/base.html' %}
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card shadow p-4 border-0">
+                <h2 class="fw-bold mb-4" style="color: #4a1525;">Riepilogo dell'Ordine</h2>
+                <div class="d-flex align-items-center mb-4 bg-light p-3 rounded">
+                    {% if canzone.copertina %}
+                        <img src="{{ canzone.copertina.url }}" class="rounded me-3" style="width: 70px; height: 70px; object-fit: cover;">
+                    {% endif %}
+                    <div>
+                        <h5 class="fw-bold mb-0">{{ canzone.titolo }}</h5>
+                        <p class="text-muted mb-0">Formato Digitale / Album</p>
+                    </div>
+                    <div class="ms-auto fs-4 fw-bold">€ {{ canzone.prezzo }}</div>
+                </div>
+                
+                <h5 class="fw-bold mb-3">Dati di Spedizione e Fatturazione</h5>
+                <form action="{% url 'ordine_riepilogo' canzone.id %}" method="POST">
+                {% csrf_token %} <!-- Obbligatorio per la sicurezza di Django -->
+                    <div class="mb-3">
+                                            <!-- NUOVO CAMPO: Selezione Quantità -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Quantità</label>
+                            <input type="number" name="quantita" class="form-control" value="1" min="1" max="10" required>
+                            <div class="form-text">Seleziona quante copie digitali o licenze desideri acquistare.</div>
+                        </div>
+                        <label class="form-label small fw-bold">Nome Completo</label>
+                        <input type="text" class="form-control" required placeholder="Mario Rossi">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Indirizzo Email</label>
+                        <input type="email" class="form-control" required placeholder="mario.rossi@example.com">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 btn-lg mt-3">Procedi al Pagamento Sicuro</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
