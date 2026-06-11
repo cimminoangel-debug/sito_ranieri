@@ -1,6 +1,11 @@
-*.pyc
-__pycache__/
 db.sqlite3
+media/
+__pycache__/
+*.pyc
+.env
 venv/
+.vscode/
+
+# Nuove aggiunte di sicurezza e pulizia
 staticfiles/
 .DS_Store

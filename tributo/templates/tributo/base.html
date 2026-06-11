@@ -22,7 +22,7 @@
 <body>
 
     <!-- Barra di Navigazione Comune -->
-        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow-sm mb-4">
+        <nav class="navbar navbar-expand-lg fixed-top navbar-dark navbar-custom shadow-sm mb-4">
         <div class="container">
             <!-- Brand principale -->
             <a class="navbar-brand fw-bold" href="{% url 'home' %}">Artista Official</a>
@@ -35,6 +35,7 @@
             <!-- Contenitore dei Link (si contrae su mobile, si espande su desktop) -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto">
+
                     <a class="nav-item nav-link text-white me-3" href="{% url 'home' %}">Home</a>
                     <a class="nav-item nav-link text-white me-3" href="{% url 'biografia' %}">Biografia</a>
                     <a class="nav-item nav-link text-white me-3" href="{% url 'discografia' %}">Discografia</a>

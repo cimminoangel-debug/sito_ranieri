@@ -3,49 +3,148 @@
 {% block title %}Biografia - Massimo Ranieri Tribute{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <h1 class="text-center display-4 fw-bold mb-5" style="color: #4a1525;">La Storia e la Carriera</h1>
+<style>
+/* Regola fondamentale per il limite di 5 righe con scorrimento */
+.cell-scrollable {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;          /* Forza il blocco massimo a 5 righe */
+    overflow-y: auto;              /* Attiva lo scroll verticale se supera le 5 righe */
+    max-height: calc(1.5em * 5);    /* Calcolo matematico preciso: altezza riga * 5 */
+    line-height: 1.5em;            /* Altezza del testo standard e pulita */
+    padding-right: 5px;            /* Spazio per non far sovrapporre la barra di scorrimento al testo */
+}
 
-    <!-- Apertura della griglia: max 1 colonna su mobile, max 3 colonne su desktop -->
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+/* Ottimizzazione per Schermi Piccoli (Cellulari) */
+@media (max-width: 768px) {
+    /* Rimuove il blocco fisso delle larghezze sui telefoni per evitare testi troppo schiacciati */
+    table {
+        table-layout: auto !important; 
+    }
+    th, td {
+        width: auto !important;
+        white-space: nowrap; /* Consente lo scorrimento orizzontale fluido su mobile */
+    }
+    .cell-scrollable {
+        max-height: calc(1.5em * 4); /* Opzionale: riduce a 4 righe lo spazio sui cellulari */
+        -webkit-line-clamp: 4;
+    }
+   
+}
+body {
+    /* Gradiente radiale: crea un nucleo celeste che sfuma morbidamente verso l'esterno */
+    background: radial-gradient(circle at 60% 40%, #bae6fd 0%, #e0f2fe 100%, #fcfbf9 150%);
+    
+    /* Forza lo sfondo a coprire tutta l'altezza dello schermo */
+    min-height: 100vh;
+    
+    /* Mantiene lo sfondo fisso durante lo scroll della pagina */
+    background-attachment: fixed;
+    
+    margin: 0;
+}
+    /* 1. CONFIGURAZIONE PER PC */
+    body {
+        background-image: url("{{ MEDIA_URL }}faville_dal_vesuvio_sfondo.jpeg");
+        background-attachment: fixed;
+        background-position: top left;
+        background-repeat: no-repeat;
+        background-size: 100% auto;
+        background-color: #1a1a1a; 
+        margin: 0;
+        padding-top: 75px; 
+        padding-left: 20px;
+        padding-right: 20px;
+        position: relative;
+        /* Impedisce tassativamente lo scroll orizzontale a livello di pagina */
+        overflow-x: hidden; 
+    }
+
+    .contenuto-principale {
+        background-color: rgba(255, 255, 255, 0.75); 
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 40px;
+        /* Sicurezza per evitare che il box superi la larghezza dello schermo */
+        max-width: 100%; 
+    }
+
+    /* 2. CONFIGURAZIONE SPECIFICA PER CELLULARI (Sotto i 768px) */
+    @media (max-width: 768px) {
+        body {
+            /* Sblocca lo scroll verticale fluido ed evita glitch */
+            background-attachment: scroll !important;
+            
+            /* RISOLUZIONE: Forza l'immagine a stare nell'angolo in alto a sinistra */
+            background-position: top left!important;
+            
+            /* RISOLUZIONE: Adatta l'immagine alla larghezza dello smartphone (non crea scroll orizzontale) */
+            background-size: 100% auto !important;
+            
+            /* Riduce i margini per gli schermi stretti */
+            padding-top: 65px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .contenuto-principale {
+            /* Riduce il padding interno per dare più spazio al testo sul telefono */
+            padding: 20px !important;
+        }
+    }
+</style>
+
+<div class="min-vh-100 d-flex flex-column align-items-center sfondo-fisso-container">
         
-        {% for bio in biografie %}
-            <div class="col">
-                <!-- La classe h-100 costringe tutte le card della stessa riga ad avere la stessa altezza -->
-                <div class="card h-100 shadow-sm border-0 border-top border-danger border-3">
-                    
-                    <!-- Sezione Immagine della Card -->
-                    {% if bio.foto_artista %}
-                        <img src="{{ bio.foto_artista.url }}" class="card-img-top" alt="{{ bio.titolo_sezione }}" style="height: 220px; object-fit: cover;">
-                    {% else %}
-                        <!-- Spazio di riempimento se manca la foto per mantenere le proporzioni -->
-                        <div class="bg-light text-center text-muted d-flex align-items-center justify-content-center" style="height: 220px;">
-                            <span class="small text-uppercase">Nessuna Immagine</span>
-                        </div>
-                    {% endif %}
-
-                    <!-- Corpo della Card (Usa d-flex per spingere il footer in basso) -->
-                    <div class="card-body d-flex flex-column">
-                        <span class="badge bg-secondary align-self-start mb-2">Dal {{ bio.anno_inizio_carriera }}</span>
-                        <h5 class="card-title fw-bold text-dark mb-3">{{ bio.titolo_sezione }}</h5>
+    </div>
+    <div class="container my-auto text-center table-responsive col-12 col-md-10 contenuto-principale"> <!--class="container my-5" -->
+        <H1 class="text-center">BIOGRAFIA</H1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width: 10%;" scope="col">Foto</th>
+                    <th style="width: 10%;" scope="col">First</th>
+                    <th style="width: 20%;" scope="col">Second</th>
+                    <th style="width: 60%;" scope="col">Testo esteso</th>
+                
+                </tr>
+            </thead>
+            <tbody>
+                {% for bio in biografie %}
+                    <tr>
                         
-                        <!-- Testo troncato o formattato con i paragrafi -->
-                        <div class="card-text text-secondary small flex-grow-1">
-                            {{ bio.testo_completo|linebreaks }}
-                        </div>
-                    </div>
 
-                </div>
-            </div>
-        {% empty %}
-            <!-- Messaggio mostrato se il database SQLite è completamente vuoto -->
-            <div class="col-12 w-100">
-                <div class="alert alert-info text-center" role="alert">
-                    La biografia dell'artista è in corso di scrittura. Torna a trovarci presto!
-                </div>
-            </div>
-        {% endfor %}
-
+                        <td>
+                            {% if bio.foto_artista %}
+                                <img src="{{ bio.foto_artista.url }}" class="img-thumbnail" alt="{{ bio.titolo_sezione }}" style="width: 60px; height: 60px; object-fit: cover;">
+                            {% else %}
+                            <!-- Spazio di riempimento se manca la foto per mantenere le proporzioni -->
+                                <div class="bg-light text-center text-muted d-flex align-items-center justify-content-center" style="height: 220px;">
+                                    <span class="small text-uppercase">Nessuna Immagine</span>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>{{ bio.anno_inizio_carriera }}</td>
+                        <td class="text-wrap" style="min-width: 200px; word-break: break-word;"><a href="#">{{ bio.titolo_sezione }}</a></td>
+                        <td class="text-wrap" style="min-width: 200px; word-break: break-word;"> <div class="cell-scrollable">{{ bio.testo_completo|linebreaks }}</div> </td>
+                        
+                    </tr>
+                        {% empty %}
+                        <!-- Messaggio mostrato se il database SQLite è completamente vuoto -->
+                            <div class="col-12 w-100">
+                                <div class="alert alert-info text-center" role="alert">
+                                La biografia dell'artista è in corso di scrittura. Torna a trovarci presto!
+                                </div>
+                            </div>
+                {% endfor %} 
+            </tbody>
+        
+        </table>
+            
+    </div>
     </div>
 </div>
 {% endblock %}

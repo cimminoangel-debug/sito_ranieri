@@ -24,5 +24,6 @@ urlpatterns = [
     path('gestione/partecipanti/esporta/excel/', views.esporta_excel_partecipanti, name='esporta_excel_partecipanti'),
     # Nuova rotta per la schermata della fotocamera del controllore
     path('gestione/scanner/', views.dashboard_scanner, name='dashboard_scanner'),
-    
+
+      
 ]

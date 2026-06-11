@@ -22,9 +22,11 @@
                             
                             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                                 <!-- Controllo temporale didattico eseguito direttamente nel template -->
-                                {% if concerto.data >= today_date or True %} 
+                                 {% now "Y-m-d" as today_date %}
+                                 {% if concerto.data >= today_date %}  <!--or true-->
                                     <!-- NOTA: Per fare il controllo preciso usiamo una logica semplice: 
                                          Se preferisci bloccare l'acquisto dall'archivio, verifichiamo la data nell'admin -->
+                                         
                                     <a href="{% url 'concerto_riepilogo' concerto.id %}" class="btn btn-teatro px-4">🎟️ Acquista</a>
                                 {% else %}
                                     <button class="btn btn-secondary btn-sm" disabled>Evento Concluso</button>

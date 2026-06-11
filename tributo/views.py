@@ -29,6 +29,7 @@ def home(request):
         'video_spettacoli': ultimi_video
     })
 
+
 # NUOVA VISTA: Elenco completo di tutti i concerti (Archivio)
 def tutti_i_concerti(request):
     # Prende tutti i concerti ordinati dal più recente al più vecchio
