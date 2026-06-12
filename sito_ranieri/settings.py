@@ -133,9 +133,24 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Durante lo sviluppo, salva le email inviate in una cartella locale chiamata "email-inviate"
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'email-inviate')
+ #Configurazione base comune
+EMAIL_HOST = '://gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'cimmino.angel@gmail.com' #Inserisci il tuo indirizzo Gmail reale
+EMAIL_HOST_PASSWORD = 'oftyhioukofjuwoz' # La tua password per le app di Google (senza spazi)
+DEFAULT_FROM_EMAIL = f'Sito Ranieri <{EMAIL_HOST_USER}>' # Questo sarà l'indirizzo che vedranno i destinatari
+
+# SE SEI SU PYTHONANYWHERE: Usa Gmail reale
+if 'pythonanywhere' in os.environ.get('HOME', ''):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    # SE SEI IN LOCALE (Debian): Salva i file nella cartella
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'email-inviate')
+
+
+
 
 STRIPE_PUBLIC_KEY = "pk_test_51TY5oDI0KegpLuHlh4Zvmy9y6CtBhYYHLyHXV7vTK9ggseu1Q477QGQF6MyXWbsN9BB62PmDOqlS4AFE0WV60DAo00pV33GrdS"
 STRIPE_SECRET_KEY = "sk_test_51TY5oDI0KegpLuHl79ULm8jcM7j3mVGyrblePEuV9ZiFeEtNoU3LW7L14pydgT3mdaeykcBRsUYv1eDviB1lCyVA00mqExHpUX"

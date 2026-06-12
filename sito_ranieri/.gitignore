@@ -9,3 +9,4 @@ venv/
 # Nuove aggiunte di sicurezza e pulizia
 staticfiles/
 .DS_Store
+email-inviate/
