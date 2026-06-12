@@ -10,3 +10,4 @@ venv/
 staticfiles/
 .DS_Store
 email-inviate/
+Password_app.txt

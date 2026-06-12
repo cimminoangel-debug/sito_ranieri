@@ -138,7 +138,7 @@ EMAIL_HOST = '://gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'cimmino.angel@gmail.com' #Inserisci il tuo indirizzo Gmail reale
-EMAIL_HOST_PASSWORD = 'oftyhioukofjuwoz' # La tua password per le app di Google (senza spazi)
+EMAIL_HOST_PASSWORD = 'tomwftyemcsacrra' # La tua password per le app di Google (senza spazi)
 DEFAULT_FROM_EMAIL = f'Sito Ranieri <{EMAIL_HOST_USER}>' # Questo sarà l'indirizzo che vedranno i destinatari
 
 # SE SEI SU PYTHONANYWHERE: Usa Gmail reale
