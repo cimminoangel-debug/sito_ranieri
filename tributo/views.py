@@ -171,7 +171,10 @@ def concerto_riepilogo(request, concerto_id):
         return redirect(sessione_checkout.url, code=303)
 
     return render(request, 'tributo/concerto_riepilogo.html', {'concerto': concerto})
-    
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+
+
     nomi_partecipanti = request.GET.getlist('nomi_biglietti')
     email_partecipanti = request.GET.getlist('email_biglietti')
     
