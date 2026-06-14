@@ -171,7 +171,13 @@ def concerto_riepilogo(request, concerto_id):
         return redirect(sessione_checkout.url, code=303)
 
     return render(request, 'tributo/concerto_riepilogo.html', {'concerto': concerto})
-    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    send_mail(
+    subject,
+    message,
+    settings.DEFAULT_FROM_EMAIL,
+    [partecipante.email],
+    fail_silently=False,  # <-- FORZA Django a mostrare l'errore nel log se l'invio fallisce
+)
 
 
 
