@@ -1,8 +1,15 @@
 from django.contrib import admin
 from django.utils.html import format_html # <-- Fondamentale per inserire codice HTML sicuro
-from .models import Canzone, Concerto, Biografia, Partecipante, VideoSpettacolo
+from .models import Canzone, Concerto, Biografia, Partecipante, Video_Gallery, Foto_Gallery
 
-@admin.register(Canzone)
+class VideoInline(admin.TabularInline):
+    model = Video_Gallery
+    extra = 1
+
+class FotoInline(admin.TabularInline):
+    model = Foto_Gallery
+    extra = 1
+
 class CanzoneAdmin(admin.ModelAdmin):
     # Mostra la miniatura nella tabella riassuntiva insieme a titolo e anno
     list_display = ('anteprima_copertina', 'titolo', 'anno_uscita', 'prezzo')
@@ -34,21 +41,22 @@ class ConcertoAdmin(admin.ModelAdmin):
 
 @admin.register(Biografia)
 class BiografiaAdmin(admin.ModelAdmin):
-    list_display = ('anteprima_foto', 'titolo_sezione', 'anno_inizio_carriera')
-    list_display_links = ('anteprima_foto', 'titolo_sezione')
+    # Mostra l'anteprima della prima foto, la data, il titolo dell'evento e il luogo
+    list_display = ('anteprima_foto', 'data_evento', 'titolo_evento', 'luogo')
+    list_display_links = ('anteprima_foto', 'titolo_evento')
+    inlines = [VideoInline, FotoInline]
 
     def anteprima_foto(self, obj):
-        if obj.foto_artista:
-            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; border: 1px solid #ddd;" />', obj.foto_artista.url)
-        return "No Foto"
+        # Prende la prima foto collegata a questo specifico evento, se esiste
+        prima_foto = obj.fotos.first()
+        if prima_foto and prima_foto.immagine:
+            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;" />', prima_foto.immagine.url)
+        return format_html('<span style="color: #999; font-style: italic;">No Foto</span>')
     
-    anteprima_foto.short_description = 'Foto Artista'
+    anteprima_foto.short_description = 'Anteprima Galleria'
 
 
 # Lasciamo il modello Partecipante con la registrazione standard
 admin.site.register(Partecipante)
 
-@admin.register(VideoSpettacolo)
-class VideoSpettacoloAdmin(admin.ModelAdmin):
-    list_display = ('titolo', 'data_aggiunta')
-    search_fields = ('titolo',)
+

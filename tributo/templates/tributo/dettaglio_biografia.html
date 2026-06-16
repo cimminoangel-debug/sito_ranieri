@@ -1,0 +1,135 @@
+{% extends 'tributo/base.html' %}
+
+{% block title %}{{ evento.titolo_evento }} - Galleria Multimediale{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    
+    <!-- Pulsante per tornare indietro alla cronologia della biografia -->
+    <div class="mb-4 no-print">
+        <a href="{% url 'lista_biografia' %}" class="btn btn-outline-dark">
+            ⬅️ Torna alla Biografia
+        </a>
+    </div>
+
+    <!-- INTESTAZIONE EVENTO -->
+    <div class="p-5 mb-5 bg-light rounded-3 shadow-sm border-start border-danger border-5">
+        <span class="badge bg-danger mb-2 px-3 py-2 fs-6">📅 {{ evento.data_evento|date:"d M Y" }}</span>
+        <h1 class="display-5 fw-bold text-dark mb-3">{{ evento.titolo_evento }}</h1>
+        {% if evento.luogo %}
+            <p class="fs-5 text-muted"><i class="bi bi-geo-alt-fill text-danger"></i> 📍 {{ evento.luogo }}</p>
+        {% endif %}
+        <hr class="my-4">
+        <!-- Descrizione formattata con i paragrafi automatici di Django -->
+        <div class="fs-5 text-secondary text-wrap" style="word-break: break-word; line-height: 1.7;">
+            {{ evento.descrizione|linebreaks }}
+        </div>
+    </div>
+
+    <!-- SEZIONE 1: GALLERIA FOTOGRAFICA -->
+    <div class="my-5">
+        <h2 class="fw-bold mb-4 pb-2 border-bottom" style="color: #4a1525;">📸 Galleria Fotografica</h2>
+        
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for foto in foto_gallery %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 bg-white overflow-hidden img-hover-zoom">
+                        {% if foto.immagine %}
+                            <img src="{{ foto.immagine.url }}" class="card-img-top" alt="{{ foto.titolo_foto }}" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        {% if foto.titolo_foto %}
+                            <div class="card-body p-2 bg-light border-top">
+                                <p class="card-text small text-muted text-center mb-0">{{ foto.titolo_foto }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-secondary text-center">Nessuna foto disponibile per questo evento.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- SEZIONE 2: GALLERIA VIDEO LOCALE -->
+    <div class="my-5">
+        <h2 class="fw-bold mb-4 pb-2 border-bottom" style="color: #4a1525;">🎥 Video e Contenuti Live</h2>
+        
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for video in video_gallery %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 bg-white">
+                        
+                        <!-- Contenitore responsive per video locali -->
+                        <div class="ratio ratio-16x9 bg-dark rounded-top">
+                            {% if video.file_video %}
+                                <!-- Player Video HTML5 con i primi blocchi di protezione di Livello 1 -->
+                                <video 
+                                    id="video-{{ video.id }}" 
+                                    controls 
+                                    controlsList="nodownload" 
+                                    oncontextmenu="return false;" 
+                                    preload="metadata" 
+                                    style="width: 100%; height: 100%; object-fit: cover;"
+                                >
+                                    <source src="{{ video.file_video.url }}" type="video/mp4">
+                                    Il tuo browser non supporta i video HTML5.
+                                </video>
+                            {% else %}
+                                <div class="text-white text-center p-5 small">⚠️ File video non disponibile sul server.</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-body p-3">
+                            <h5 class="fw-bold text-dark mb-0">{{ video.titolo_video }}</h5>
+                        </div>
+
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-secondary text-center">Nessun filmato disponibile per questo evento.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Stile CSS extra inserito al volo per l'effetto zoom sulle immagini -->
+<style>
+    .img-hover-zoom img {
+        transition: transform .3s ease;
+    }
+    .img-hover-zoom:hover img {
+        transform: scale(1.05);
+    }
+</style>
+
+<script>
+    // Seleziona tutti i video presenti nella pagina
+    const tuttiIVideo = document.querySelectorAll('video');
+
+    tuttiIVideo.forEach(video => {
+        // 1. Blocca il click del tasto destro sul video
+        video.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // 2. Impedisce il trascinamento del video fuori dal browser (Drag and Drop)
+        video.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+        });
+    });
+
+    // 3. Blocca le scorciatoie da tastiera comuni per salvare la pagina (Ctrl+S / Ctrl+U)
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'u')) {
+            e.preventDefault();
+            alert("Operazione non consentita a tutela dei diritti dell'artista.");
+        }
+    });
+</script>
+
+
+{% endblock %}

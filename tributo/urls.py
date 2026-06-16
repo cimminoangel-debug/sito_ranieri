@@ -6,7 +6,6 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('discografia/', views.discografia, name='discografia'),
     path('concerti/tutti/', views.tutti_i_concerti, name='tutti_i_concerti'), # <-- Nuova riga
-    path('biografia/', views.biografia, name='biografia'),
     
     # Flusso Acquisto Brani Musicali (Stripe)
     path('ordine/<int:canzone_id>/riepilogo/', views.ordine_riepilogo, name='ordine_riepilogo'),
@@ -24,6 +23,7 @@ urlpatterns = [
     path('gestione/partecipanti/esporta/excel/', views.esporta_excel_partecipanti, name='esporta_excel_partecipanti'),
     # Nuova rotta per la schermata della fotocamera del controllore
     path('gestione/scanner/', views.dashboard_scanner, name='dashboard_scanner'),
-
-      
+    path('biografia/', views.lista_biografia, name='lista_biografia'),
+    path('biografia/<int:evento_id>/', views.dettaglio_biografia, name='dettaglio_biografia'),
+     
 ]

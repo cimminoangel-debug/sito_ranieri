@@ -136,23 +136,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import os
 
 # Configurazione base comune
-EMAIL_HOST = 'smtp.gmail.com'  # CORRETTO: Rimosso '://' e inserito il server SMTP di Google
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'cimmino.angel@gmail.com'
-
-# CORRETTO: Assegnata direttamente la password delle app senza il cancelletto del commento
-EMAIL_HOST_PASSWORD = 'tomwftyemcsacrra' 
-
+EMAIL_HOST_PASSWORD = 'tomwftyemcsacrra'  # <-- Assicurati che sia l'ultima password per le app generata su Google
 DEFAULT_FROM_EMAIL = f'Sito Ranieri <{EMAIL_HOST_USER}>'
 
-# SE SEI SU PYTHONANYWHERE: Usa Gmail reale (il controllo sulla cartella HOME funziona)
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
 if 'pythonanywhere' in os.environ.get('HOME', ''):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    # PER ACCOUNT A PAGAMENTO: Usa tassativamente il server di Google
+    EMAIL_HOST = '://gmail.com'  
 else:
-    # SE SEI IN LOCALE (Debian): Salva i file nella cartella di test
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'email-inviate')
+
+
 
 
 

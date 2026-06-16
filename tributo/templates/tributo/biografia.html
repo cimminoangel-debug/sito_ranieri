@@ -113,34 +113,54 @@ body {
                 </tr>
             </thead>
             <tbody>
-                {% for bio in biografie %}
+                {% for bio in eventi %}
                     <tr>
-                        
-
+                        <!-- Colonna 1: Anteprima Foto dell'evento (pescata dalla galleria collegata) -->
                         <td>
-                            {% if bio.foto_artista %}
-                                <img src="{{ bio.foto_artista.url }}" class="img-thumbnail" alt="{{ bio.titolo_sezione }}" style="width: 60px; height: 60px; object-fit: cover;">
+                            {% if bio.fotos.first %}
+                                <img src="{{ bio.fotos.first.immagine.url }}" class="img-thumbnail" alt="{{ bio.titolo_evento }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
                             {% else %}
-                            <!-- Spazio di riempimento se manca la foto per mantenere le proporzioni -->
-                                <div class="bg-light text-center text-muted d-flex align-items-center justify-content-center" style="height: 220px;">
-                                    <span class="small text-uppercase">Nessuna Immagine</span>
+                                <!-- Box grigio minimale e compatto di riempimento se manca la foto -->
+                                <div class="bg-light text-center text-muted d-flex align-items-center justify-content-center rounded" style="width: 60px; height: 60px;">
+                                    <span class="text-uppercase" style="font-size: 8px;">No Foto</span>
                                 </div>
                             {% endif %}
                         </td>
-                        <td>{{ bio.anno_inizio_carriera }}</td>
-                        <td class="text-wrap" style="min-width: 200px; word-break: break-word;"><a href="#">{{ bio.titolo_sezione }}</a></td>
-                        <td class="text-wrap" style="min-width: 200px; word-break: break-word;"> <div class="cell-scrollable">{{ bio.testo_completo|linebreaks }}</div> </td>
-                        
-                    </tr>
-                        {% empty %}
-                        <!-- Messaggio mostrato se il database SQLite è completamente vuoto -->
-                            <div class="col-12 w-100">
-                                <div class="alert alert-info text-center" role="alert">
-                                La biografia dell'artista è in corso di scrittura. Torna a trovarci presto!
-                                </div>
+
+                        <!-- Colonna 2: Data dell'evento (mostra solo l'anno grazie al filtro |date:"Y") -->
+                        <td class="fw-bold text-secondary">
+                            {{ bio.data_evento|date:"Y" }}
+                        </td>
+
+                        <!-- Colonna 3: Titolo dell'evento cliccabile (Apre il dettaglio dell'artista) -->
+                        <td class="text-wrap" style="min-width: 200px; word-break: break-word;">
+                            <a href="{% url 'dettaglio_biografia' bio.id %}" class="text-decoration-none fw-bold text-danger">
+                                {{ bio.titolo_evento }}
+                            </a>
+                            {% if bio.luogo %}
+                                <small class="text-muted d-block">📍 {{ bio.luogo }}</small>
+                            {% endif %}
+                        </td>
+
+                        <!-- Colonna 4: Descrizione dell'evento -->
+                        <td class="text-wrap" style="min-width: 200px; word-break: break-word;">
+                            <div class="cell-scrollable">
+                                {{ bio.descrizione|linebreaks }}
                             </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <!-- Riga di cortesia se non ci sono eventi nel database SQLite3 -->
+                    <tr>
+                        <td colspan="4">
+                            <div class="alert alert-info text-center my-3" role="alert">
+                                La biografia cronologica dell'artista è in corso di aggiornamento. Torna a trovarci presto!
+                            </div>
+                        </td>
+                    </tr>
                 {% endfor %} 
             </tbody>
+
         
         </table>
             

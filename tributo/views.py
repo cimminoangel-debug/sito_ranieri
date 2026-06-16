@@ -13,21 +13,30 @@ from django.conf import settings
 from django.core.mail import EmailMessage 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from .models import Canzone, Concerto, Biografia, Partecipante, VideoSpettacolo
-
+from .models import Canzone, Concerto, Biografia, Partecipante, Video_Gallery, Foto_Gallery
 def controllo_staff(user):
     return user.is_authenticated and user.is_staff
 
 # Viste Principali del Sito
 def home(request):
-    oggi = timezone.now().date()
-    concerti_futuri = Concerto.objects.filter(data__gte=oggi).order_by('data')
-    ultimi_video = VideoSpettacolo.objects.all().order_by('-data_aggiunta')[:2]
+    concerti = Concerto.objects.all().order_by('data')[:3] # Prende i primi 3 concerti
+    ultimi_video = Video_Gallery.objects.all().order_by('-id')[:2] # Prende gli ultimi 2 video inseriti
     
-    return render(request, 'tributo/home.html', {
-        'concerti': concerti_futuri,
-        'video_spettacoli': ultimi_video
-    })
+    context = {
+        'concerti': concerti,
+        'ultimi_video': ultimi_video, # Deve avere lo stesso nome usato nel ciclo {% for video in ultimi_video %}
+    }
+    return render(request, 'tributo/home.html', context)
+
+# def home(request):
+#     oggi = timezone.now().date()
+#     concerti_futuri = Concerto.objects.filter(data__gte=oggi).order_by('data')
+#     ultimi_video = Video_Gallery.objects.all().order_by('-data_aggiunta')[:2]
+    
+#     return render(request, 'tributo/home.html', {
+#         'concerti': concerti_futuri,
+#         'video_spettacoli': ultimi_video
+#     })
 
 
 # NUOVA VISTA: Elenco completo di tutti i concerti (Archivio)
@@ -171,15 +180,7 @@ def concerto_riepilogo(request, concerto_id):
         return redirect(sessione_checkout.url, code=303)
 
     return render(request, 'tributo/concerto_riepilogo.html', {'concerto': concerto})
-    send_mail(
-    subject,
-    message,
-    settings.DEFAULT_FROM_EMAIL,
-    [partecipante.email],
-    fail_silently=False,  # <-- FORZA Django a mostrare l'errore nel log se l'invio fallisce
-)
-
-
+   
 
     nomi_partecipanti = request.GET.getlist('nomi_biglietti')
     email_partecipanti = request.GET.getlist('email_biglietti')
@@ -265,17 +266,22 @@ def genera_pdf_biglietto(partecipante):
     return buffer.getvalue()
 
 
-def invia_email_con_biglietto(partecipante):
-    pdf_data = genera_pdf_biglietto(partecipante)
+def invia_email_con_biglietto(request, partecipante): # Aggiunto request
+    # Passiamo sia request che partecipante alla funzione del PDF
+    pdf_data = genera_pdf_biglietto(request, partecipante)
+    
     email = EmailMessage(
         subject=f"Il tuo Biglietto per {partecipante.concerto.luogo}",
         body=f"Gentile {partecipante.nome_completo},\n\nin allegato trovi il tuo biglietto ufficiale in formato PDF.\n\nCi vediamo allo spettacolo!\nStaff Artista Ufficiale",
-
-        from_email='biglietteria@sitotributo.it',
+        # Usa il mittente autorizzato impostato in settings.py
+        from_email=settings.DEFAULT_FROM_EMAIL, 
         to=[partecipante.email],
     )
     email.attach(f"Biglietto_{partecipante.codice_biglietto}.pdf", pdf_data, "application/pdf")
-    email.send()
+    
+    # fail_silently=False ci mostrerà eventuali blocchi di Google nel log
+    email.send(fail_silently=False) 
+
 
 
 # === FUNZIONE DI APERTURA E VISUALIZZAZIONE DEL PDF SULLA DASHBOARD ===
@@ -333,6 +339,7 @@ def lista_partecipanti(request):
     totale_ingressi = partecipanti.filter(utilizzato=True).count()
         
     return render(request, 'tributo/lista_partecipanti.html', {
+        
         'partecipanti': partecipanti,
         'concerti': tutti_i_concerti,
         'concerto_selezionato_id': concerto_filtrato_id,
@@ -446,3 +453,24 @@ def concerto_pagamento_successo(request):
 def dashboard_scanner(request):
     # Questa pagina serve solo a caricare l'interfaccia della fotocamera
     return render(request, 'tributo/dashboard_scanner.html')
+
+def lista_biografia(request):
+    """Mostra l'elenco cronologico di tutti gli eventi/concerti della biografia."""
+    # Estrae tutti gli eventi ordinati dal più recente al più vecchio
+    eventi = Biografia.objects.all().order_by('-data_evento')
+    return render(request, 'tributo/biografia.html', {'eventi': eventi})
+
+def dettaglio_biografia(request, evento_id):
+    """Mostra i dettagli di un singolo evento con le foto e i video collegati."""
+    evento = get_object_or_404(Biografia, pk=evento_id)
+    
+    # Recupera i contenuti multimediali collegati grazie alle ForeignKey
+    foto_gallery = evento.fotos.all()
+    video_gallery = evento.videos.all()
+    
+    context = {
+        'evento': evento,
+        'foto_gallery': foto_gallery,
+        'video_gallery': video_gallery,
+    }
+    return render(request, 'tributo/dettaglio_biografia.html', context)

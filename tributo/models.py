@@ -27,13 +27,19 @@ class Concerto(models.Model):
     #     return f"{self.titolo} ({data_formattata})"
 
 class Biografia(models.Model):
-    titolo_sezione = models.CharField(max_length=200, default="La Storia")
-    testo_completo = models.TextField()
-    anno_inizio_carriera = models.IntegerField(default=1964)
-    foto_artista = models.ImageField(upload_to='biografia/', blank=True, null=True)
+    """
+    Rappresenta l'evento principale o la tappa della carriera (es. Concerto a Sanremo).
+    """
+    titolo_evento = models.CharField(max_length=200, verbose_name="Titolo Evento/Concerto")
+    data_evento = models.DateField(verbose_name="Data dell'Evento")
+    descrizione = models.TextField(verbose_name="Descrizione dettagliata")
+    luogo = models.CharField(max_length=200, blank=True, null=True, verbose_name="Luogo")
 
-    def __str__(self):
-        return self.titolo_sezione
+    class Meta:
+        verbose_name_plural = "Biografie"
+
+    def __construct__(self):
+        return f"{self.data_evento} - {self.titolo_evento}"
     
 class Partecipante(models.Model):
     # Collega il partecipante a uno specifico concerto
@@ -48,17 +54,50 @@ class Partecipante(models.Model):
     def __str__(self):
         return f"{self.nome_completo} - {self.concerto.luogo} (Usato: {self.utilizzato})"
 
-class VideoSpettacolo(models.Model):
-    titolo = models.CharField(max_length=200)
-    descrizione = models.TextField(blank=True, null=True)
-    # Aggiungiamo blank=True e null=True per gestire i vecchi dati senza blocchi
-    file_video = models.FileField(upload_to='video/', blank=True, null=True, help_text="Carica un file video (es. formato .mp4)")
-    data_aggiunta = models.DateTimeField(auto_now_add=True)
+# class VideoSpettacolo(models.Model):
+#     titolo = models.CharField(max_length=200)
+#     descrizione = models.TextField(blank=True, null=True)
+#     # Aggiungiamo blank=True e null=True per gestire i vecchi dati senza blocchi
+#     file_video = models.FileField(upload_to='video/', blank=True, null=True, help_text="Carica un file video (es. formato .mp4)")
+#     data_aggiunta = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return self.titolo
+    
+#     class Meta:
+#         verbose_name_plural = "Video Spettacoli"
+
+class Video_Gallery(models.Model):
+    """
+    Relazione Uno-a-Molti: Una Biografia può avere PIÙ video locali caricati sul server.
+    """
+    biografia = models.ForeignKey(Biografia, on_delete=models.CASCADE, related_name='videos', verbose_name="Collegato all'evento")
+    titolo_video = models.CharField(max_length=200, verbose_name="Titolo del Video")
+    
+    # MODIFICA QUI: Sostituito URLField con FileField per caricare i file .mp4
+    file_video = models.FileField(
+        max_length=255, 
+        upload_to='videos/', 
+        verbose_name="File Video (Formato MP4 consigliato)",
+        blank=True, 
+        null=True
+    )
+
+    class Meta:
+        verbose_name_plural = "Video Gallery"
 
     def __str__(self):
-        return self.titolo
-    
-    class Meta:
-        verbose_name_plural = "Video Spettacoli"
+        return self.titolo_video
 
+
+class Foto_Gallery(models.Model):
+    """
+    Relazione Uno-a-Molti: Una Biografia può avere PIÙ foto collegate.
+    """
+    biografia = models.ForeignKey(Biografia, on_delete=models.CASCADE, related_name='fotos', verbose_name="Collegato all'evento")
+    titolo_foto = models.CharField(max_length=200, blank=True, verbose_name="Didascalia Foto")
+    immagine = models.ImageField(max_length=255, upload_to='gallery/', verbose_name="File Immagine")
+
+    class Meta:
+        verbose_name_plural = "Foto Gallery"       
     
