@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'tributo',
     'qr_code', 
     'django_extensions',
+    'django_ckeditor_5',
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -152,10 +155,55 @@ else:
     EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'email-inviate')
 
 
-
-
-
-
-
 STRIPE_PUBLIC_KEY = "pk_test_51TY5oDI0KegpLuHlh4Zvmy9y6CtBhYYHLyHXV7vTK9ggseu1Q477QGQF6MyXWbsN9BB62PmDOqlS4AFE0WV60DAo00pV33GrdS"
 STRIPE_SECRET_KEY = "sk_test_51TY5oDI0KegpLuHl79ULm8jcM7j3mVGyrblePEuV9ZiFeEtNoU3LW7L14pydgT3mdaeykcBRsUYv1eDviB1lCyVA00mqExHpUX"
+
+# Incolla questo blocco in fondo al file settings.py
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': [
+            'heading', '|',
+            'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+            'bold', 'italic', 'underline', 'strikethrough', 'removeFormat', '|',
+            'alignment', '|',
+            'bulletedList', 'numberedList', 'todoList', '|',
+            'outdent', 'indent', '|',
+            'link', 'imageUpload', 'insertTable', 'blockQuote', 'codeBlock', '|',
+            'undo', 'redo'
+        ],
+        # Configurazione specifica per l'allineamento
+        'alignment': {
+            'options': ['left', 'center', 'right', 'justify']
+        },
+        # Configurazione per la gestione delle tabelle
+        'table': {
+            'contentToolbar': [
+                'tableColumn', 'tableRow', 'mergeTableCells',
+                'tableProperties', 'tableCellProperties'
+            ]
+        },
+        # Configurazione delle dimensioni del font disponibili
+        'fontSize': {
+            'options': [
+                10, 12, 14, 'default', 18, 20, 24, 30
+            ],
+            'supportAllValues': True
+        },
+        # Configurazione della palette colori (per testo e sfondo)
+        'fontColor': {
+            'columns': 5,
+            'documentColors': 10,
+        },
+        'fontBackgroundColor': {
+            'columns': 5,
+        },
+        # Impostazioni di layout dell'editor nell'area di amministrazione/form
+        'height': 400,
+        'width': '100%',
+        'language': 'it', # Forza l'interfaccia dell'editor in italiano
+    },
+}
+
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"

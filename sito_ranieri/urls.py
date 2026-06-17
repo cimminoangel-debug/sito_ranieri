@@ -21,6 +21,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # 1. AGGIUNGI QUESTA RIGA PER CKEDITOR 5
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
     path('', include('tributo.urls')),
 ]
 

@@ -1,0 +1,94 @@
+{% extends 'tributo/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Elenco Canzoni</h2>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3 row">
+        <!-- Casella di Ricerca Istantanea -->
+        <div class="col-md-6 col-sm-12 mb-2">
+            <div class="input-group">
+                <!-- Icona della lente di ingrandimento come prefisso -->
+                <span class="input-group-text bg-light text-muted" id="search-addon">
+                    <svg xmlns="http://w3.org" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                </span>
+                <input type="text" 
+                    id="search-input" 
+                    class="form-control form-control-lg shadow-sm" 
+                    placeholder="Cerca per titolo istantaneamente..." 
+                    aria-describedby="search-addon">
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 text-md-end text-sm-start mb-2">
+            {% if user.is_authenticated %}
+                <a href="{% url 'canzone_create' %}" class="btn btn-primary">Aggiungi Canzone</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <table class="table table-striped align-middle" id="canzoni-table">
+        <thead>
+            <tr>
+                <th>Titolo</th>
+                <th>Anno</th>
+                <th>Prezzo</th>
+                {% if user.is_authenticated %}<th>Azioni</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for canzone in canzoni %}
+            <!-- Aggiungiamo un attributo data-titolo per facilitare la ricerca JS -->
+            <tr class="canzone-row" data-titolo="{{ canzone.titolo|lower }}">
+                <td class="canzone-titolo">{{ canzone.titolo }}</td>
+                <td>{{ canzone.anno_uscita }}</td>
+                <td>€ {{ canzone.prezzo }}</td>
+                {% if user.is_authenticated %}
+                <td>
+                    <a href="{% url 'canzone_update' canzone.pk %}" class="btn btn-sm btn-warning">Modifica</a>
+                    <a href="{% url 'canzone_delete' canzone.pk %}" class="btn btn-sm btn-danger">Elimina</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr id="no-results-django">
+                <td colspan="4" class="text-center text-muted">Nessuna canzone presente.</td>
+            </tr>
+            {% endfor %}
+            <!-- Riga nascosta pronta a mostrarsi se la ricerca JS non trova nulla -->
+            <tr id="no-results-js" style="display: none;">
+                <td colspan="4" class="text-center text-muted py-3">Nessuna canzone corrisponde alla ricerca.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- SCRIPT JAVASCRIPT PER IL FILTRO IN TEMPO REALE -->
+<script>
+    document.getElementById('search-input').addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.canzone-row');
+        let visibleRowsCount = 0;
+
+        rows.forEach(row => {
+            // Legge il titolo salvato nell'attributo data-titolo
+            const titolo = row.getAttribute('data-titolo');
+            
+            if (titolo.includes(query)) {
+                row.style.display = ''; // Mostra la riga
+                visibleRowsCount++;
+            } else {
+                row.style.display = 'none'; // Nasconde la riga
+            }
+        });
+
+        // Gestione del messaggio "Nessun risultato"
+        const noResultsMessage = document.getElementById('no-results-js');
+        if (visibleRowsCount === 0 && rows.length > 0) {
+            noResultsMessage.style.display = '';
+        } else {
+            noResultsMessage.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

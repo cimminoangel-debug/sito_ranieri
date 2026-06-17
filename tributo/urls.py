@@ -25,5 +25,8 @@ urlpatterns = [
     path('gestione/scanner/', views.dashboard_scanner, name='dashboard_scanner'),
     path('biografia/', views.lista_biografia, name='lista_biografia'),
     path('biografia/<int:evento_id>/', views.dettaglio_biografia, name='dettaglio_biografia'),
-     
+    path('canzoni/', views.CanzoneListView.as_view(), name='canzone_list'),
+    path('canzoni/nuova/', views.CanzoneCreateView.as_view(), name='canzone_create'),
+    path('canzoni/<int:pk>/modifica/', views.CanzoneUpdateView.as_view(), name='canzone_update'),
+    path('canzoni/<int:pk>/elimina/', views.CanzoneDeleteView.as_view(), name='canzone_delete'), 
 ]

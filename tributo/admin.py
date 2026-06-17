@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html # <-- Fondamentale per inserire codice HTML sicuro
-from .models import Canzone, Concerto, Biografia, Partecipante, Video_Gallery, Foto_Gallery
+from .models import Canzone, Concerto, Biografia, Partecipante, Video_Gallery, Foto_Gallery, TuoModello
 
 class VideoInline(admin.TabularInline):
     model = Video_Gallery
@@ -59,4 +59,6 @@ class BiografiaAdmin(admin.ModelAdmin):
 # Lasciamo il modello Partecipante con la registrazione standard
 admin.site.register(Partecipante)
 
-
+@admin.register(TuoModello)
+class TuoModelloAdmin(admin.ModelAdmin):
+    list_display = ('id',)# o altri campi che vuoi mostrare nella tabella

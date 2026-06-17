@@ -1,4 +1,5 @@
 {% extends 'tributo/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block title %}Discografia - Massimo Ranieri Tribute{% endblock %}
 
@@ -31,8 +32,9 @@
                         <span class="badge bg-secondary align-self-start mb-2">Anno {{ canzone.anno_uscita }}</span>
                         <h5 class="card-title fw-bold text-dark mb-3">{{ canzone.titolo }}</h5>
                         
-                        <div class="card-text text-secondary small flex-grow-1 mb-3">
-                            {{ canzone.testo|linebreaks|truncatewords:20 }}
+                        <div class="card-text text-secondary small flex-grow-1 mb-3 testo-canzone">
+                            <!--{{ canzone.testo|linebreaks|truncatewords:20 }}-->
+                            {{ canzone.testo|safe }} 
                         </div>
 
                         <!-- NUOVA SEZIONE: Prezzo e Bottone -->

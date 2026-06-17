@@ -1,0 +1,11 @@
+{% extends 'tributo/base.html' %}
+{% block content %}
+<h2>Elimina Canzone</h2>
+<p>Sei sicuro di voler eliminare la canzone "{{ object.titolo }}"?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Conferma Eliminazione</button>
+    <a href="{% url 'canzone_list' %}" class="btn btn-secondary">Annulla</a>
+</form>
+{% endblock %}

@@ -10,10 +10,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import HttpResponse
 from django.conf import settings
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from django.core.mail import EmailMessage 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from .models import Canzone, Concerto, Biografia, Partecipante, Video_Gallery, Foto_Gallery
+from .forms import CanzoneForm
 def controllo_staff(user):
     return user.is_authenticated and user.is_staff
 
@@ -373,6 +378,8 @@ def esporta_excel_partecipanti(request):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Registro Biglietti"
+
+
     
     # 4. Scrive la riga di intestazione (Header)
     intestazioni = ["Codice Biglietto", "Nominativo", "Email", "Spettacolo / Luogo", "Data Acquisto", "Stato Ingressi"]
@@ -474,3 +481,30 @@ def dettaglio_biografia(request, evento_id):
         'video_gallery': video_gallery,
     }
     return render(request, 'tributo/dettaglio_biografia.html', context)
+
+
+# 1. LISTA DELLE CANZONI (Visibile a tutti o solo a loggati, a tua scelta)
+class CanzoneListView(ListView):
+    model = Canzone
+    template_name = 'tributo/canzone_list.html'
+    context_object_name = 'canzoni'
+
+# 2. INSERIMENTO (Solo utenti loggati)
+class CanzoneCreateView(LoginRequiredMixin, CreateView):
+    model = Canzone
+    form_class = CanzoneForm
+    template_name = 'tributo/canzone_form.html'
+    success_url = reverse_lazy('canzone_list')
+
+# 3. MODIFICA (Solo utenti loggati)
+class CanzoneUpdateView(LoginRequiredMixin, UpdateView):
+    model = Canzone
+    form_class = CanzoneForm
+    template_name = 'tributo/canzone_form.html'
+    success_url = reverse_lazy('canzone_list')
+
+# 4. CANCELLAZIONE (Solo utenti loggati)
+class CanzoneDeleteView(LoginRequiredMixin, DeleteView):
+    model = Canzone
+    template_name = 'tributo/canzone_confirm_delete.html'
+    success_url = reverse_lazy('canzone_list')

@@ -1,0 +1,20 @@
+{% extends 'tributo/base.html' %}
+{% load crispy_forms_tags %} <!-- 1. Carica i tag di Crispy -->
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if filter_view.object %}Modifica{% else %}Nuova{% endif %} Canzone</h2>
+    {{ form.media }} 
+    <form method="post" enctype="multipart/form-data" class="mt-3">
+        {% csrf_token %}
+        
+        <!-- 2. Applica il filtro crispy al form -->
+        {{ form|crispy }}
+        
+        <div class="mt-3">
+            <button type="submit" class="btn btn-success">Salva Canzone</button>
+            <a href="{% url 'canzone_list' %}" class="btn btn-secondary">Annulla</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,4 +1,9 @@
 from django.db import models
+from django_ckeditor_5.fields import CKEditor5Field
+
+class TuoModello(models.Model):
+    # Richiama la configurazione 'default' definita in settings.py
+    contenuto = CKEditor5Field('Contenuto', config_name='default')
 
 class Canzone(models.Model):
     titolo = models.CharField(max_length=200)
