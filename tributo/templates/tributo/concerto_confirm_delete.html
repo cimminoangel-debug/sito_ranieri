@@ -1,0 +1,11 @@
+{% extends 'tributo/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card border-danger p-4 text-center">
+        <h2 class="text-danger">Elimina Concerto</h2>
+        <p class="lead">Sei sicuro di voler eliminare il concerto a <strong>{{ object.citta }}</strong> ({{ object.luogo }}) del {{ object.data|date:"d/m/Y" }}?</p>
+        <form method="post" class="mt-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Sì, Elimina Definitivamente</button>
+            <a href="{% url 'concerto_list' %}" class="btn btn-secondary">Annulla</a>
+        </form>

@@ -1,0 +1,22 @@
+{% extends 'tributo/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow p-4">
+                <h2>{% if form.instance.pk %}Modifica{% else %}Nuovo{% endif %} Concerto</h2>
+                <form method="post" enctype="multipart/form-data" class="mt-3">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{% url 'concerto_list' %}" class="btn btn-secondary">Annulla</a>
+                        <button type="submit" class="btn btn-success">Salva Concerto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

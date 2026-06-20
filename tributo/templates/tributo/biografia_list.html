@@ -1,0 +1,110 @@
+{% extends 'tributo/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Gestione Tappe Biografia</h2>
+    
+    <!-- Doppia Casella di Ricerca Istantanea -->
+    <div class="row mb-4 g-3 align-items-end">
+        <div class="col-md-4 col-sm-6">
+            <label for="search-anno" class="form-label small text-muted fw-bold">📅 Filtra per Anno</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted">🔍</span>
+                <input type="text" id="search-anno" class="form-control" placeholder="Es. 1980...">
+            </div>
+        </div>
+        
+        <div class="col-md-5 col-sm-6">
+            <label for="search-titolo" class="form-label small text-muted fw-bold">📖 Filtra per Titolo Evento</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted">🔍</span>
+                <input type="text" id="search-titolo" class="form-control" placeholder="Cerca titolo evento...">
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-12 text-md-end text-sm-start">
+            {% if user.is_authenticated %}
+                <a href="{% url 'biografia_create' %}" class="btn btn-primary w-100">Aggiungi Tappa</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tabella delle Biografie -->
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Titolo Evento</th>
+                <th>Luogo</th>
+                {% if user.is_authenticated %}<th>Azioni</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody id="biografie-table">
+            {% for bio in biografie %}
+            <!-- Salviamo l'anno e il titolo in due attributi "data" separati per il JS -->
+            <tr class="bio-row" 
+                data-anno="{{ bio.data_evento|date:'Y' }}" 
+                data-titolo="{{ bio.titolo_evento|lower }}">
+                <td>{{ bio.data_evento|date:"d/m/Y" }}</td>
+                <td><strong>{{ bio.titolo_evento }}</strong></td>
+                <td>{{ bio.luogo|default:"-" }}</td>
+                {% if user.is_authenticated %}
+                <td>
+                    <a href="{% url 'biografia_update' bio.pk %}" class="btn btn-sm btn-warning">Modifica</a>
+                    <a href="{% url 'biografia_delete' bio.pk %}" class="btn btn-sm btn-danger">Elimina</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr id="django-empty-row"><td colspan="4" class="text-center text-muted">Nessun evento inserito in biografia.</td></tr>
+            {% endfor %}
+            <!-- Riga di cortesia JS in caso di nessun risultato combinato -->
+            <tr id="no-results-js" style="display: none;">
+                <td colspan="4" class="text-center text-muted py-3">Nessun evento corrisponde ai filtri selezionati.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    const inputAnno = document.getElementById('search-anno');
+    const inputTitolo = document.getElementById('search-titolo');
+    const rows = document.querySelectorAll('.bio-row');
+    const noResultsRow = document.getElementById('no-results-js');
+
+    // Funzione centralizzata che controlla entrambi i filtri contemporaneamente
+    function filtraTabella() {
+        const queryAnno = inputAnno.value.trim();
+        const queryTitolo = inputTitolo.value.toLowerCase().trim();
+        let righeVisibili = 0;
+
+        rows.forEach(row => {
+            const annoRecord = row.getAttribute('data-anno');
+            const titoloRecord = row.getAttribute('data-titolo');
+
+            // Verifica se il record soddisfa ENTRAMBI i criteri digitati
+            const corrispondeAnno = annoRecord.includes(queryAnno);
+            const corrispondeTitolo = titoloRecord.includes(queryTitolo);
+
+            if (corrispondeAnno && corrispondeTitolo) {
+                row.style.display = ''; // Mostra la riga
+                righeVisibili++;
+            } else {
+                row.style.display = 'none'; // Nasconde la riga
+            }
+        });
+
+        // Gestione visiva del messaggio "Nessun risultato"
+        if (righeVisibili === 0 && rows.length > 0) {
+            noResultsRow.style.display = '';
+        } else {
+            noResultsRow.style.display = 'none';
+        }
+    }
+
+    // Ascolta la digitazione (input) su entrambe le caselle
+    inputAnno.addEventListener('input', filtraTabella);
+    inputTitolo.addEventListener('input', filtraTabella);
+</script>
+
+{% endblock %}

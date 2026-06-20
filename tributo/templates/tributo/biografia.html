@@ -61,9 +61,9 @@ body {
     }
 
     .contenuto-principale {
-        background-color: rgba(255, 255, 255, 0.75); 
+        background-color: rgba(255, 255, 255, 0.55); 
         backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(30px);
         border: 1px solid rgba(255, 255, 255, 0.4);
         border-radius: 16px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -97,24 +97,43 @@ body {
     }
 </style>
 
-<div class="min-vh-100 d-flex flex-column align-items-center sfondo-fisso-container">
+<!-- 1. IL CONTENITORE PRINCIPALE (Aperto qui, racchiude TUTTO lo sfondo) -->
+<!-- Cambia 'percorso/tua-immagine.jpg' con il link reale alla foto dell'artista -->
+<div class="min-vh-100 d-flex flex-column align-items-center" 
+     style="background-image: url('/static/images/sfondo.jpg'); background-attachment: fixed; background-size: cover; background-position: center; width: 100%;">
+    
+    <!-- 2. IL CONTENITORE DEL CONTENUTO (Spinto in basso a 1/4 di schermo) -->
+    <!-- 'style="margin-top: 25vh;"' sposta la tabella esattamente a 1/4 dell'altezza schermo (25% di Viewport Height) -->
+    <div class="container contenuto-principale shadow mb-5" style="margin-top: 25vh; max-width: 900px;">
         
-    </div>
-    <div class="container my-auto text-center table-responsive col-12 col-md-10 contenuto-principale"> <!--class="container my-5" -->
-        <H1 class="text-center">BIOGRAFIA</H1>
-        <table class="table">
-            <thead>
+        <h2 class="mb-4 text-dark text-center">La Cronologia Biografica</h2>
+        
+        <!-- Doppia Casella di Ricerca -->
+        <div class="row mb-4 g-3">
+            <div class="col-md-4 col-sm-12">
+                <label for="search-anno" class="form-label small text-muted fw-bold">📅 Filtra per Anno</label>
+                <input type="text" id="search-anno" class="form-control" placeholder="Es. 1980...">
+            </div>
+            <div class="col-md-8 col-sm-12">
+                <label for="search-titolo" class="form-label small text-muted fw-bold">📖 Filtra per Titolo Evento</label>
+                <input type="text" id="search-titolo" class="form-control" placeholder="Cerca tra gli eventi in archivio...">
+            </div>
+        </div>
+
+        <!-- Tabella -->
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
                 <tr>
                     <th style="width: 10%;" scope="col">Foto</th>
-                    <th style="width: 10%;" scope="col">First</th>
-                    <th style="width: 20%;" scope="col">Second</th>
-                    <th style="width: 60%;" scope="col">Testo esteso</th>
-                
+                    <th>Data</th>
+                    <th>Titolo Evento</th>
+                    <th>Luogo</th>
                 </tr>
             </thead>
             <tbody>
                 {% for bio in eventi %}
-                    <tr>
+                    <tr class="bio-row" data-anno="{{ bio.data_evento|date:'Y' }}" data-titolo="{{ bio.titolo_evento|lower }}">
+
                         <!-- Colonna 1: Anteprima Foto dell'evento (pescata dalla galleria collegata) -->
                         <td>
                             {% if bio.fotos.first %}
@@ -145,7 +164,7 @@ body {
                         <!-- Colonna 4: Descrizione dell'evento -->
                         <td class="text-wrap" style="min-width: 200px; word-break: break-word;">
                             <div class="cell-scrollable">
-                                {{ bio.descrizione|linebreaks }}
+                                {{ bio.descrizione|safe }}
                             </div>
                         </td>
                     </tr>
@@ -160,11 +179,63 @@ body {
                     </tr>
                 {% endfor %} 
             </tbody>
-
-        
         </table>
-            
-    </div>
-    </div>
-</div>
+        
+    </div> <!-- Fine del contenitore bianco della tabella -->
+
+</div> <!-- 3. IL CONTENITORE DELLO SFONDO VIENE CHIUSO SOLO QUI, A FINE PAGINA -->
+
+<!-- SCRIPT PER ABILITARE LA RICERCA ISTANTANEA INCROCIATA -->
+<script>
+    // 1. Agganciamo le caselle di testo per l'Anno e per il Titolo
+    const inputAnno = document.getElementById('search-anno');
+    const inputTitolo = document.getElementById('search-titolo');
+    
+    // 2. Selezioniamo tutte le righe della tabella biografia
+    const rows = document.querySelectorAll('.bio-row');
+    
+    // 3. Recuperiamo la riga nascosta per il messaggio "Nessun risultato"
+    const noResultsRow = document.getElementById('no-results-js');
+
+    // Funzione interna che analizza ed esegue il filtro in tempo reale
+    function eseguiFiltroIstantaneo() {
+        const queryAnno = inputAnno.value.trim();
+        const queryTitolo = inputTitolo.value.toLowerCase().trim();
+        let righeTrovate = 0;
+
+        rows.forEach(row => {
+            // Legge i dati salvati negli attributi data-anno e data-titolo di ogni riga
+            const annoRecord = row.getAttribute('data-anno') || '';
+            const titoloRecord = row.getAttribute('data-titolo') || '';
+
+            // Controlla se la riga corrente soddisfa entrambi i criteri digitati
+            const corrispondeAnno = annoRecord.includes(queryAnno);
+            const corrispondeTitolo = titoloRecord.includes(queryTitolo);
+
+            if (corrispondeAnno && corrispondeTitolo) {
+                row.style.display = ''; // Rende la riga visibile
+                righeTrovate++;
+            } else {
+                row.style.display = 'none'; // Nasconde la riga
+            }
+        });
+
+        // Se i filtri nascondono tutti i record, mostra il messaggio di cortesia
+        if (noResultsRow) {
+            if (righeTrovate === 0 && rows.length > 0) {
+                noResultsRow.style.display = '';
+            } else {
+                noResultsRow.style.display = 'none';
+            }
+        }
+    }
+
+    // 4. Abilitiamo i text di ricerca registrando l'evento di digitazione ('input')
+    if (inputAnno && inputTitolo) {
+        inputAnno.addEventListener('input', eseguiFiltroIstantaneo);
+        inputTitolo.addEventListener('input', eseguiFiltroIstantaneo);
+        console.log("🔍 Sistema di ricerca istantanea abilitato con successo!");
+    }
+</script>
+
 {% endblock %}

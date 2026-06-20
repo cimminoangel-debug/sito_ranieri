@@ -18,7 +18,7 @@ from django.core.mail import EmailMessage
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from .models import Canzone, Concerto, Biografia, Partecipante, Video_Gallery, Foto_Gallery
-from .forms import CanzoneForm
+from .forms import CanzoneForm, ConcertoForm, BiografiaForm, FotoGalleryFormSet, VideoGalleryFormSet
 def controllo_staff(user):
     return user.is_authenticated and user.is_staff
 
@@ -508,3 +508,107 @@ class CanzoneDeleteView(LoginRequiredMixin, DeleteView):
     model = Canzone
     template_name = 'tributo/canzone_confirm_delete.html'
     success_url = reverse_lazy('canzone_list')
+
+# 1. ELENCO CONCERTI
+class ConcertoListView(ListView):
+    model = Concerto
+    template_name = 'tributo/concerto_list.html'
+    context_object_name = 'concerti'
+    ordering = ['-data'] # Mostra prima i concerti più recenti o futuri
+
+# 2. INSERIMENTO CONCERTO (Protetto)
+class ConcertoCreateView(LoginRequiredMixin, CreateView):
+    model = Concerto
+    form_class = ConcertoForm
+    template_name = 'tributo/concerto_form.html'
+    success_url = reverse_lazy('concerto_list')
+
+# 3. MODIFICA CONCERTO (Protetto)
+class ConcertoUpdateView(LoginRequiredMixin, UpdateView):
+    model = Concerto
+    form_class = ConcertoForm
+    template_name = 'tributo/concerto_form.html'
+    success_url = reverse_lazy('concerto_list')
+
+# 4. CANCELLAZIONE CONCERTO (Protetto)
+class ConcertoDeleteView(LoginRequiredMixin, DeleteView):
+    model = Concerto
+    template_name = 'tributo/concerto_confirm_delete.html'
+    success_url = reverse_lazy('concerto_list')
+
+# 1. ELENCO BIOGRAFIE (Ordinato cronologicamente)
+class BiografiaListView(ListView):
+    model = Biografia
+    template_name = 'tributo/biografia_list.html'
+    context_object_name = 'biografie'
+    ordering = ['-data_evento'] # Mostra prima gli eventi più recenti
+
+# 2. INSERIMENTO BIOGRAFIA (Protetto)
+class BiografiaCreateView(LoginRequiredMixin, CreateView):
+    model = Biografia
+    form_class = BiografiaForm
+    template_name = 'tributo/biografia_form.html'
+    success_url = reverse_lazy('biografia_list')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['foto_formset'] = FotoGalleryFormSet(self.request.POST, self.request.FILES)
+            data['video_formset'] = VideoGalleryFormSet(self.request.POST, self.request.FILES)
+        else:
+            data['foto_formset'] = FotoGalleryFormSet()
+            data['video_formset'] = VideoGalleryFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        foto_formset = context['foto_formset']
+        video_formset = context['video_formset']
+        if form.is_valid() and foto_formset.is_valid() and video_formset.is_valid():
+            self.object = form.save()
+            foto_formset.instance = self.object
+            foto_formset.save()
+            video_formset.instance = self.object
+            video_formset.save()
+            return super().form_valid(form)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+# 3. MODIFICA BIOGRAFIA (Protetto)
+class BiografiaUpdateView(LoginRequiredMixin, UpdateView):
+    model = Biografia
+    form_class = BiografiaForm
+    template_name = 'tributo/biografia_form.html'
+    success_url = reverse_lazy('biografia_list')
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['foto_formset'] = FotoGalleryFormSet(self.request.POST, self.request.FILES, instance=self.object)
+            data['video_formset'] = VideoGalleryFormSet(self.request.POST, self.request.FILES, instance=self.object)
+        else:
+            data['foto_formset'] = FotoGalleryFormSet(instance=self.object)
+            data['video_formset'] = VideoGalleryFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        foto_formset = context['foto_formset']
+        video_formset = context['video_formset']
+        if form.is_valid() and foto_formset.is_valid() and video_formset.is_valid():
+            self.object = form.save()
+            foto_formset.instance = self.object
+            foto_formset.save()
+            video_formset.instance = self.object
+            video_formset.save()
+            return super().form_valid(form)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+   
+
+# 4. CANCELLAZIONE BIOGRAFIA (Protetto)
+class BiografiaDeleteView(LoginRequiredMixin, DeleteView):
+    model = Biografia
+    template_name = 'tributo/biografia_confirm_delete.html'
+    success_url = reverse_lazy('biografia_list')
+

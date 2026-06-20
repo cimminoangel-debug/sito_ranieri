@@ -37,7 +37,7 @@ class Biografia(models.Model):
     """
     titolo_evento = models.CharField(max_length=200, verbose_name="Titolo Evento/Concerto")
     data_evento = models.DateField(verbose_name="Data dell'Evento")
-    descrizione = models.TextField(verbose_name="Descrizione dettagliata")
+    descrizione = CKEditor5Field('Descrizione dettagliata', config_name='default')
     luogo = models.CharField(max_length=200, blank=True, null=True, verbose_name="Luogo")
 
     class Meta:

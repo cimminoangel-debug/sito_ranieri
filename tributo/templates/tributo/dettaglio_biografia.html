@@ -22,35 +22,76 @@
         <hr class="my-4">
         <!-- Descrizione formattata con i paragrafi automatici di Django -->
         <div class="fs-5 text-secondary text-wrap" style="word-break: break-word; line-height: 1.7;">
-            {{ evento.descrizione|linebreaks }}
+            {{ evento.descrizione|safe }}
         </div>
     </div>
 
     <!-- SEZIONE 1: GALLERIA FOTOGRAFICA -->
+        <!-- SEZIONE 1: GALLERIA FOTOGRAFICA IN ROTAZIONE (CAROUSEL) -->
     <div class="my-5">
         <h2 class="fw-bold mb-4 pb-2 border-bottom" style="color: #4a1525;">📸 Galleria Fotografica</h2>
         
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-            {% for foto in foto_gallery %}
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0 bg-white overflow-hidden img-hover-zoom">
-                        {% if foto.immagine %}
-                            <img src="{{ foto.immagine.url }}" class="card-img-top" alt="{{ foto.titolo_foto }}" style="height: 200px; object-fit: cover;">
-                        {% endif %}
-                        {% if foto.titolo_foto %}
-                            <div class="card-body p-2 bg-light border-top">
-                                <p class="card-text small text-muted text-center mb-0">{{ foto.titolo_foto }}</p>
-                            </div>
-                        {% endif %}
+        {% if foto_gallery %}
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10 col-12">
+                    
+                    <!-- Contenitore Principale del Carosello Bootstrap -->
+                    <div id="carouselBiografia" class="carousel slide shadow rounded overflow-hidden" data-bs-ride="carousel" data-bs-interval="4000">
+                        
+                        <!-- Gli indicatori inferiori (i puntini) -->
+                        <div class="carousel-indicators">
+                            {% for foto in foto_gallery %}
+                                <button type="button" 
+                                        data-bs-target="#carouselBiografia" 
+                                        data-bs-slide-to="{{ forloop.counter0 }}" 
+                                        class="{% if forloop.first %}active{% endif %}" 
+                                        aria-current="{% if forloop.first %}true{% endif %}" 
+                                        aria-label="Slide {{ forloop.counter }}">
+                                </button>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Le diapositive (Slides) -->
+                        <div class="carousel-inner bg-dark">
+                            {% for foto in foto_gallery %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <!-- Contenitore per mantenere le foto proporzionate -->
+                                    <div class="d-flex align-items-center justify-content-center bg-black" style="height: 500px;">
+                                        <img src="{{ foto.immagine.url }}" 
+                                             class="d-block w-100 h-100" 
+                                             alt="{{ foto.titolo_foto|default:'Foto evento' }}"
+                                             style="object-fit: contain;">
+                                    </div>
+                                    <!-- Didascalia sovrimpressa (Compare solo se inserita) -->
+                                    {% if foto.titolo_foto %}
+                                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded px-3 py-1 start-50 translate-middle-x" style="bottom: 40px; width: fit-content;">
+                                            <p class="mb-0 fs-6">{{ foto.titolo_foto }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Frecce di Navigazione Laterali -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselBiografia" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon bg-dark bg-opacity-25 rounded-circle p-3" aria-hidden="true"></span>
+                            <span class="visually-hidden">Precedente</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselBiografia" data-bs-slide="next">
+                            <span class="carousel-control-next-icon bg-dark bg-opacity-25 rounded-circle p-3" aria-hidden="true"></span>
+                            <span class="visually-hidden">Successivo</span>
+                        </button>
+                        
                     </div>
+                    
                 </div>
-            {% empty %}
-                <div class="col-12">
-                    <div class="alert alert-secondary text-center">Nessuna foto disponibile per questo evento.</div>
-                </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% else %}
+            <!-- Messaggio se la galleria è vuota -->
+            <div class="alert alert-secondary text-center">Nessuna foto disponibile per questo evento.</div>
+        {% endif %}
     </div>
+
 
     <!-- SEZIONE 2: GALLERIA VIDEO LOCALE -->
     <div class="my-5">

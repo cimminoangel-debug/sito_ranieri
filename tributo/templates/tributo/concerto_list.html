@@ -1,0 +1,61 @@
+{% extends 'tributo/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Gestione Concerti</h2>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3 row">
+        <div class="col-md-6 col-sm-12 mb-2">
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted" id="search-addon">🔍</span>
+                <input type="text" id="search-input" class="form-control" placeholder="Cerca per città o luogo...">
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12 text-md-end mb-2">
+            {% if user.is_authenticated %}
+                <a href="{% url 'concerto_create' %}" class="btn btn-primary">Aggiungi Concerto</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Città</th>
+                <th>Luogo</th>
+                <th>Prezzo Biglietto</th>
+                {% if user.is_authenticated %}<th>Azioni</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody id="concerti-table">
+            {% for concerto in concerti %}
+            <tr class="concerto-row" data-search="{{ concerto.citta|lower }} {{ concerto.luogo|lower }}">
+                <td>{{ concerto.data|date:"d/m/Y" }}</td>
+                <td><strong>{{ concerto.citta }}</strong></td>
+                <td>{{ concerto.luogo }}</td>
+                <td>€ {{ concerto.prezzo }}</td>
+                {% if user.is_authenticated %}
+                <td>
+                    <a href="{% url 'concerto_update' concerto.pk %}" class="btn btn-sm btn-warning">Modifica</a>
+                    <a href="{% url 'concerto_delete' concerto.pk %}" class="btn btn-sm btn-danger">Elimina</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-muted">Nessun concerto in programma.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById('search-input').addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.concerto-row');
+        rows.forEach(row => {
+            const text = row.getAttribute('data-search');
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

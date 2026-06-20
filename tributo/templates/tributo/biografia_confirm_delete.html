@@ -1,0 +1,14 @@
+{% extends 'tributo/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card border-danger p-4 text-center mx-auto" style="max-width: 600px;">
+        <h2 class="text-danger">Elimina Tappa Biografia</h2>
+        <p class="lead">Sei sicuro di voler eliminare l'evento <strong>{{ object.titolo_evento }}</strong> del {{ object.data_evento|date:"d/m/Y" }}?</p>
+        <form method="post" class="mt-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Sì, Elimina</button>
+            <a href="{% url 'biografia_list' %}" class="btn btn-secondary">Annulla</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

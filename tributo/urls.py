@@ -29,4 +29,12 @@ urlpatterns = [
     path('canzoni/nuova/', views.CanzoneCreateView.as_view(), name='canzone_create'),
     path('canzoni/<int:pk>/modifica/', views.CanzoneUpdateView.as_view(), name='canzone_update'),
     path('canzoni/<int:pk>/elimina/', views.CanzoneDeleteView.as_view(), name='canzone_delete'), 
+    path('concerti/', views.ConcertoListView.as_view(), name='concerto_list'),
+    path('concerti/nuovo/', views.ConcertoCreateView.as_view(), name='concerto_create'),
+    path('concerti/<int:pk>/modifica/', views.ConcertoUpdateView.as_view(), name='concerto_update'),
+    path('concerti/<int:pk>/elimina/', views.ConcertoDeleteView.as_view(), name='concerto_delete'),
+    path('biografie/', views.BiografiaListView.as_view(), name='biografia_list'),
+    path('biografie/nuova/', views.BiografiaCreateView.as_view(), name='biografia_create'),
+    path('biografie/<int:pk>/modifica/', views.BiografiaUpdateView.as_view(), name='biografia_update'),
+    path('biografie/<int:pk>/elimina/', views.BiografiaDeleteView.as_view(), name='biografia_delete'),
 ]
