@@ -2,12 +2,16 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+
+{{ form.media }}
+{{ foto_formset.media }}
+{{ video_formset.media }}
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-10 col-md-12">
             <div class="card shadow p-4 mb-5">
                 <h2 class="mb-4">{% if form.instance.pk %}Modifica{% else %}Nuova{% endif %} Tappa Biografica</h2>
-                {{ form.media }}
+                <!--{{ form.media }}-->
                 
                 <form method="post" enctype="multipart/form-data" id="biografia-form">
                     {% csrf_token %}
@@ -30,10 +34,16 @@
                         <div id="foto-formset-container">
                             {% for foto_form in foto_formset %}
                                 <div class="row g-3 align-items-center mb-3 item-form-row-foto">
-                                    <div class="col-md-6">{{ foto_form.titolo_foto|as_crispy_field }}</div>
-                                    <div class="col-md-4">{{ foto_form.immagine|as_crispy_field }}</div>
+                                    <div class="col-md-12">{{ foto_form.titolo_foto|as_crispy_field }}</div>
+                                
+                                </div>
+                                <div class="row col-md-12">
+                                    <div>
+                                        {{ foto_form.immagine|as_crispy_field }}
+                                    </div>
+                                </div>
                                     {% if foto_formset.can_delete and foto_form.instance.pk %}
-                                        <div class="col-md-2 text-danger text-center">
+                                        <div class="row col-md-2 text-danger text-center">
                                             {{ foto_form.DELETE|as_crispy_field }}
                                         </div>
                                     {% endif %}
@@ -61,14 +71,20 @@
                         <div id="video-formset-container">
                             {% for video_form in video_formset %}
                                 <div class="row g-3 align-items-center mb-3 item-form-row-video">
-                                    <div class="col-md-6">{{ video_form.titolo_video|as_crispy_field }}</div>
-                                    <div class="col-md-4">{{ video_form.file_video|as_crispy_field }}</div>
-                                    {% if video_formset.can_delete and video_form.instance.pk %}
-                                        <div class="col-md-2 text-danger text-center">
-                                            {{ video_form.DELETE|as_crispy_field }}
-                                        </div>
-                                    {% endif %}
-                                    {% if video_form.id %}{{ video_form.id }}{% endif %}
+                                    <div></div>
+                                </div>
+                                <div class="row col-md-12">
+                                    <div>{{ video_form.titolo_video|as_crispy_field }}</div>
+                                </div>                                
+                                    <div class="row col-md-12">
+                                        <div>{{ video_form.file_video|as_crispy_field }}</div>
+                                        {% if video_formset.can_delete and video_form.instance.pk %}
+                                            <div class="col-md-2 text-danger text-center">
+                                                {{ video_form.DELETE|as_crispy_field }}
+                                            </div>
+                                        {% endif %}
+                                        {% if video_form.id %}{{ video_form.id }}{% endif %}
+                                    </div>
                                 </div>
                             {% endfor %}
                             
