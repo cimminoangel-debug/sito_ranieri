@@ -207,3 +207,10 @@ CKEDITOR_5_CONFIGS = {
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# Dice a Django che è sotto HTTPS quando riceve l'header da Nginx
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Opzionale: attiva la protezione sui cookie in ambiente sicuro
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True

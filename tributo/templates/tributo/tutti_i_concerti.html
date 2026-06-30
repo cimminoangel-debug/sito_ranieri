@@ -6,10 +6,13 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-md-10 mx-auto">
+            <br>
             <h1 class="fw-bold mb-5 text-center" style="color: #4a1525;">Cronologia Spettacoli e Tour</h1>
 
             <div class="list-group shadow-sm rounded">
+                {% now "Y-m-d" as today_date %}
                 {% for concerto in concerti %}
+
                     <div class="list-group-item p-4 bg-white mb-2 border rounded shadow-sm">
                         <div class="row align-items-center">
                             <div class="col-md-8">
@@ -22,8 +25,8 @@
                             
                             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                                 <!-- Controllo temporale didattico eseguito direttamente nel template -->
-                                 {% now "Y-m-d" as today_date %}
-                                 {% if concerto.data >= today_date %}  <!--or true-->
+                                 
+                                 {% if concerto.data|date:"Y-m-d" >= today_date %}  <!--or true-->
                                     <!-- NOTA: Per fare il controllo preciso usiamo una logica semplice: 
                                          Se preferisci bloccare l'acquisto dall'archivio, verifichiamo la data nell'admin -->
                                          
@@ -34,6 +37,7 @@
                             </div>
                         </div>
                     </div>
+                
                 {% empty %}
                     <div class="alert alert-warning text-center">Nessun concerto presente nel registro di sistema.</div>
                 {% endfor %}

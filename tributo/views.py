@@ -24,8 +24,8 @@ def controllo_staff(user):
 
 # Viste Principali del Sito
 def home(request):
-    concerti = Concerto.objects.all().order_by('data')[:3] # Prende i primi 3 concerti
-    ultimi_video = Video_Gallery.objects.all().order_by('-id')[:2] # Prende gli ultimi 2 video inseriti
+    concerti = Concerto.objects.all().order_by('data')#[:3] # Prende i primi 3 concerti
+    ultimi_video = Video_Gallery.objects.all().order_by('-id')[:2] # -id Prende gli ultimi 2 video inseriti
     
     context = {
         'concerti': concerti,

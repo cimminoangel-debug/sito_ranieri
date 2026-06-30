@@ -2,8 +2,8 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-
 {{ form.media }}
+
 {{ foto_formset.media }}
 {{ video_formset.media }}
 <div class="container mt-4">
@@ -149,5 +149,7 @@
         
         totalVideoForms.value = currentFormCount + 1;
     });
+    
 </script>
+    
 {% endblock %}
